@@ -141,13 +141,13 @@ class GIF {
     private decodeFrame(frame) {
         let imageData = this._context.getImageData(frame.img.x, frame.img.y, frame.img.w, frame.img.h)
         frame.img.m ? this._tab = frame.img.colorTab : this._tab = this._info.colorTab;
-        LZW.decode(frame.img.srcBuf, frame.img.codeSize).forEach(function (j, k) {
+        LZW.decode(frame.img.srcBuf, frame.img.codeSize).forEach((j, k) => {
             imageData.data[k * 4] = this._tab[j * 3];
             imageData.data[k * 4 + 1] = this._tab[j * 3 + 1];
             imageData.data[k * 4 + 2] = this._tab[j * 3 + 2];
             imageData.data[k * 4 + 3] = 255;
             frame.ctrl.t ? (j == frame.ctrl.tranIndex ? imageData.data[k * 4 + 3] = 0 : 0) : 0;
-        }.bind(this));
+        });
 
         //测试数据
         // for (var i = 0; i < imageData.data.length; i += 4) {
@@ -401,9 +401,9 @@ class GIF {
      */
     private getHeader() {
         this._info.header = '';
-        this.read(6).forEach(function (e, i, arr) {
+        this.read(6).forEach((e, i, arr) => {
             this._info.header += String.fromCharCode(e);
-        }.bind(this));
+        });
     }
 
     /**
@@ -461,7 +461,7 @@ class GIF {
                 while (1) {
                     arr = this.read(1);
                     if (arr[0]) {
-                        this.read(arr[0]).forEach(function (e, i, arr) {
+                        this.read(arr[0]).forEach((e, i, arr) => {
                             srcBuf.push(e);
                         });
                     } else {
@@ -472,7 +472,7 @@ class GIF {
                 };
                 break;
             case 59:
-                console.log('The end.', this._offset, this.buffer.byteLength)
+                // console.log('The end.', this._offset, this.buffer.byteLength)
                 break;
             default:
                 // console.log(arr);
@@ -490,9 +490,9 @@ class GIF {
             case 255: //应用程序扩展
                 if (this.read(1)[0] == 11) {
                     this._info.appVersion = '';
-                    this.read(11).forEach(function (e, i, arr) {
+                    this.read(11).forEach((e, i, arr) => {
                         this._info.appVersion += String.fromCharCode(e);
-                    }.bind(this));
+                    });
                     while (1) {
                         arr = this.read(1);
                         if (arr[0]) {
@@ -530,7 +530,7 @@ class GIF {
             case 254: //注释块
                 arr = this.read(1);
                 if (arr[0]) {
-                    this.read(arr[0]).forEach(function (e, i, arr) {
+                    this.read(arr[0]).forEach((e, i, arr) => {
                         this._info.comment += String.fromCharCode(e);
                     });
                     if (this.read(1)[0] == 0) {
@@ -579,17 +579,10 @@ class GIFCache {
     static getInstance() {
         if (!GIFCache.instance) {
             GIFCache.instance = new GIFCache();
-            /** 注册gif格式图片为自己的加载器*/
-            // cc.loader.addDownloadHandlers({
-            //     "gif": cc.loader.downloader
-            // });
-            cc.loader.addLoadHandlers({
-                "gif": async function (item, callback) {
-                    let gif = new GIF();
-                    console.log(item)
-                    let buffer = await (item.content as Blob).arrayBuffer();
-                    gif.handle(buffer, callback)
-                }
+            cc.assetManager.parser.register('.gif', async (file: Blob, options, onComplete) => {
+                let gif = new GIF();
+                let buffer = await file.arrayBuffer();
+                gif.handle(buffer, onComplete)
             })
         }
         return GIFCache.instance;
