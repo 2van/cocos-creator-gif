@@ -578,6 +578,7 @@ class GIFCache {
 
     static getInstance() {
         if (!GIFCache.instance) {
+            cc.macro.ALLOW_IMAGE_BITMAP = true;
             GIFCache.instance = new GIFCache();
             cc.assetManager.parser.register('.gif', async (file: Blob, options, onComplete) => {
                 let gif = new GIF();
