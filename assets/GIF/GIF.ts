@@ -56,8 +56,8 @@ class GIF {
 
     /**
      * 将buffer 解析为gif 核心
-     * @param item 
-     * @param callback 
+     * @param item
+     * @param callback
      */
     handle(item, callback) {
         this.buffer = item;
@@ -73,7 +73,7 @@ class GIF {
 
     /**
      * 文件类型识别
-     * @param data 
+     * @param data
      */
     static detectFormat(data): FileType {
         if (data.indexOf(FileHead.IMAGE_GIF) != -1) {
@@ -91,7 +91,7 @@ class GIF {
 
     /**
      * 二进制转换为十六进制字符串
-     * @param arrBytes 
+     * @param arrBytes
      */
     static bytes2HexString(arrBytes) {
         var str = "";
@@ -126,7 +126,7 @@ class GIF {
 
     /**
      * 得到对应索引的精灵帧
-     * @param index 
+     * @param index
      */
     public getSpriteFrame(index) {
         if (this._spriteFrames[index]) return this._spriteFrames[index];
@@ -184,7 +184,7 @@ class GIF {
     /**
      * 网页版转换
      * 将DataUrl的数据转换为cc.SpriteFrame
-     * @param dataUrl 
+     * @param dataUrl
      */
     private dataUrl2SpriteFrame(dataUrl) {
         let texture = new cc.Texture2D()
@@ -199,9 +199,9 @@ class GIF {
     /**
      * native版转换
      * 用renderTexture将二进制数据制作为cc.SpriteFrame
-     * @param data 
-     * @param w 
-     * @param h 
+     * @param data
+     * @param w
+     * @param h
      */
     private date2SpriteFrame(data, w, h) {
         let texture = new cc.RenderTexture();
@@ -324,8 +324,8 @@ class GIF {
      * 模式2 清理画布 显示新的图片
      * 模式3 保持上一个状态
      * 模式4-7 。。。。
-     * @param imageData 
-     * @param frame 
+     * @param imageData
+     * @param frame
      */
     putImageDataWeb(imageData, frame) {
         let finalImageData
@@ -662,7 +662,7 @@ class GIFCache {
     /**
      * onDestroy 释放资源
      * 资源引用计数为0的时候释放资源
-     * @param key 
+     * @param key
      */
     relase(key: any) {
         if (this.has(key)) {
