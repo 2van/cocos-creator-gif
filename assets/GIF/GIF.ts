@@ -20,6 +20,25 @@ export class FileHead {
     static WEBP_WEBP = "57454250";
 }
 
+// iOS / Safari support
+Blob.prototype.arrayBuffer ??=function(){ return new Response(this).arrayBuffer() }
+function downloadAsBlob(url):Promise<Blob> {
+    return new Promise(function(resolve, reject) {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.responseType = "blob";
+            xhr.onerror = function() {reject("Network error.")};
+            xhr.onload = function() {
+                if (xhr.status === 200) {resolve(xhr.response)}
+                else {reject("Loading error:" + xhr.statusText)}
+            };
+            xhr.send();
+        }
+        catch(err) {reject(err.message)}
+    });
+}
+
 /**
  * GIF解析
  */
@@ -580,9 +599,15 @@ class GIFCache {
         if (!GIFCache.instance) {
             cc.macro.ALLOW_IMAGE_BITMAP = true;
             GIFCache.instance = new GIFCache();
-            cc.assetManager.parser.register('.gif', async (file: Blob, options, onComplete) => {
+            cc.assetManager.parser.register('.gif', async (file: Blob | HTMLImageElement, options, onComplete) => {
+                let buffer;
+                if('src' in file){
+                    let _file = await downloadAsBlob(file.src);                    
+                    buffer = await _file.arrayBuffer();
+                }else{
+                    buffer = await file.arrayBuffer();
+                }
                 let gif = new GIF();
-                let buffer = await file.arrayBuffer();
                 gif.handle(buffer, onComplete)
             })
         }
